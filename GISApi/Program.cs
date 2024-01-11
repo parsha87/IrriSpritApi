@@ -203,7 +203,7 @@ builder.Services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3
 var app = builder.Build();
 app.UseAuthentication();
 app.UseCors("AllowSpecificOrigin");
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseMvcWithDefaultRoute();
 // Add the middleware to hide headers
 app.UseMiddleware<HideHeadersMiddleware>();

@@ -16,9 +16,16 @@ namespace GISApi.Helpers
             CreateMap<AddEditUserViewModel, ApplicationUser>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.UserName));
 
-          
 
-                  //CreateMap<ProjectViewModel, TblProject>()
+
+            CreateMap<FilterSequenceSetting, FilterSequenceSettingViewModel>();
+            CreateMap<FilterSequenceSettingViewModel, FilterSequenceSetting>();
+
+            CreateMap<MaxFiltervalveSetting, MaxFiltervalveSettingViewModel>();
+            CreateMap<MaxFiltervalveSettingViewModel, MaxFiltervalveSetting>();
+
+
+            //CreateMap<ProjectViewModel, TblProject>()
             //    .ForMember(dest => dest.ProjectNumber, opt => opt.Condition(src => (src.ProjectId == 0))); //conditionally update project number only when creating project
 
             //CreateMap<Inspections, InspectionViewModel>();
