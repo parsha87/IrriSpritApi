@@ -43,6 +43,7 @@ namespace GISApi.Models
         public string SubUserPhoneNo { get; set; }
         public string SubUserFirstName { get; set; }
         public string SubUserLastName { get; set; }
+        public List<int> ControllerIdsList { get; set; } = new List<int>();
         public List<UserControllerMapping> userControllerMappings { get; set; } = new List<UserControllerMapping>();
        
 

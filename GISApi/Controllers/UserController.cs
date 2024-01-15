@@ -52,7 +52,8 @@ namespace GISApi.Controllers
             _roleManager = roleManager;
             _appDbContext = appDbContext;
             _webHostEnvironment = hostingEnvironment;
-            _globalDBContext = globalDBContext; _commonService = commonService;
+            _globalDBContext = globalDBContext;
+            _commonService = commonService;
 
         }
 
@@ -325,7 +326,12 @@ namespace GISApi.Controllers
                             ModelState.AddModelError("Error", $"Role ({model.RoleName}) not found!");
                             return BadRequest(new CustomBadRequest(ModelState));
                         }
-
+                        List<ControllerMaster> allControllers = null;
+                        if (model.ControllerIdsList.Count > 0)
+                        {
+                            //Get List of all controllers
+                            allControllers = _globalDBContext.ControllerMasters.ToList();
+                        }
                         ApplicationUser user = new ApplicationUser();
                         try
                         {
@@ -344,7 +350,7 @@ namespace GISApi.Controllers
                                 RoleName = model.RoleName,
                                 CountryId = model.CountryId,
                                 CountryName = model.CountryName,
-                                IsParent = model.IsParent,
+                                IsParent = true,
                                 LanguageId = model.LanguageId,
                                 LanguageName = model.LanguageName,
                                 ParentId = model.ParentId,
@@ -375,16 +381,29 @@ namespace GISApi.Controllers
                             }
                             await _appDbContext.SaveChangesAsync();
 
-                            if (model.userControllerMappings.Count > 0)
+                            if (model.ControllerIdsList.Count > 0)
                             {
                                 var usrMappings = _globalDBContext.UserControllerMappings.Where(x => x.UserId == user.Id).ToList();
                                 _globalDBContext.UserControllerMappings.RemoveRange(usrMappings);
                                 await _globalDBContext.SaveChangesAsync();
 
-                                await _globalDBContext.UserControllerMappings.AddRangeAsync(model.userControllerMappings);
+
+                                List<UserControllerMapping> mapplingList = new List<UserControllerMapping>();
+                                foreach (var item in model.ControllerIdsList)
+                                {
+                                    UserControllerMapping userControllerMapping = new UserControllerMapping();
+                                    userControllerMapping.ControllerId = item;
+                                    userControllerMapping.IsForParent = true;
+                                    userControllerMapping.UserId = user.Id;
+                                    userControllerMapping.IsActive = true;
+                                    userControllerMapping.ControllerNo = allControllers.Where(x => x.Id == item).Select(x => x.ControllerNo).FirstOrDefault();
+                                    mapplingList.Add(userControllerMapping);
+                                }
+
+                                await _globalDBContext.UserControllerMappings.AddRangeAsync(mapplingList);
                                 await _globalDBContext.SaveChangesAsync();
 
-                                var usrMappingsFinalIds = _globalDBContext.UserControllerMappings.Where(x => x.UserId == user.Id).Select(x=>x.Id).ToList();
+                                var usrMappingsFinalIds = _globalDBContext.UserControllerMappings.Where(x => x.UserId == user.Id).Select(x => x.Id).ToList();
                                 var controlerMasters = _globalDBContext.ControllerMasters.Where(x => usrMappingsFinalIds.Contains(x.Id)).ToList();
                                 foreach (var item in controlerMasters)
                                 {
@@ -425,10 +444,10 @@ namespace GISApi.Controllers
                                         RoleName = model.RoleName,
                                         CountryId = model.CountryId,
                                         CountryName = model.CountryName,
-                                        IsParent = model.IsParent,
+                                        IsParent = false,
                                         LanguageId = model.LanguageId,
                                         LanguageName = model.LanguageName,
-                                        ParentId = model.ParentId,
+                                        ParentId = user.Id,
                                         TimeZone = model.TimeZone,
                                     };
                                     var result = await _userManager.CreateAsync(subuser, model.Password);
@@ -460,7 +479,20 @@ namespace GISApi.Controllers
                                         _globalDBContext.UserControllerMappings.RemoveRange(usrMappings);
                                         await _globalDBContext.SaveChangesAsync();
 
-                                        await _globalDBContext.UserControllerMappings.AddRangeAsync(model.userControllerMappings);
+
+                                        List<UserControllerMapping> mapplingList = new List<UserControllerMapping>();
+                                        foreach (var item in model.ControllerIdsList)
+                                        {
+                                            UserControllerMapping userControllerMapping = new UserControllerMapping();
+                                            userControllerMapping.ControllerId = item;
+                                            userControllerMapping.IsForParent = false;
+                                            userControllerMapping.UserId = subuser.Id;
+                                            userControllerMapping.IsActive = true;
+                                            userControllerMapping.ControllerNo = allControllers.Where(x => x.Id == item).Select(x => x.ControllerNo).FirstOrDefault();
+                                            mapplingList.Add(userControllerMapping);
+                                        }
+
+                                        await _globalDBContext.UserControllerMappings.AddRangeAsync(mapplingList);
                                         await _globalDBContext.SaveChangesAsync();
 
                                         var usrMappingsFinalIds = _globalDBContext.UserControllerMappings.Where(x => x.UserId == subuser.Id).Select(x => x.Id).ToList();

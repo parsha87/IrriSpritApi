@@ -20,4 +20,7 @@ public partial class UserControllerMapping
     public bool? IsActive { get; set; }
 
     public bool? IsForParent { get; set; }
+
+    [StringLength(100)]
+    public string? ControllerNo { get; set; }
 }
