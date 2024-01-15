@@ -16,4 +16,8 @@ public partial class UserControllerMapping
     public string? UserId { get; set; }
 
     public int? ControllerId { get; set; }
+
+    public bool? IsActive { get; set; }
+
+    public bool? IsForParent { get; set; }
 }

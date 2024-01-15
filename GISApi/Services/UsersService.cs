@@ -120,25 +120,31 @@ namespace GISApi.Services
             try
             {
                 var userInfo = await (from user in _GlobalDBContext.AspNetUsers
-                                          //join userrole in _GlobalDBContext.Aspnetuserroles on user.Id equals userrole.UserId
-                                          //join role in _GlobalDBContext.Aspnetroles on user.RoleId equals role.Id
+                                          //join role in _GlobalDBContext.AspNetRoles on user.RoleId equals role.Id
                                       where user.Id == userId
                                       select new AddEditUserViewModel
                                       {
-                                          //UserId = x.Id,
-                                          //UserName = x.UserName,
-                                          //Email = x.Email,
-                                          //LastName = x.LastName,
-                                          //FirstName = x.FirstName,
-                                          //RoleId = x.RoleId,
-                                          //RoleName = x.RoleName,
-                                          //IsActive = (bool)x.IsActive,
-                                          //PhoneNumber = x.PhoneNumber,
-                                          //Address = x.Address,
-                                          //DisplayUserName = x.DisplayUserName
-
-
+                                          Id = user.Id,
+                                          UserName = user.UserName,
+                                          Email = user.Email,
+                                          LastName = user.LastName,
+                                          FirstName = user.FirstName,
+                                          RoleId = user.RoleId,
+                                          RoleName = user.RoleName,
+                                          IsActive = (bool)user.IsActive,
+                                          PhoneNumber = user.PhoneNumber,
+                                          Address = user.Address,
+                                          CountryId = (int)user.CountryId,
+                                          CountryName = user.CountryName,
+                                          LanguageId = (int)user.LanguageId,
+                                          LanguageName = user.LanguageName,
+                                          IsParent = (bool)user.IsParent,
+                                          ParentId = user.ParentId,
+                                          TimeZone = user.TimeZone,
                                       }).FirstOrDefaultAsync();
+
+                var userControllers = _GlobalDBContext.UserControllerMappings.Where(x => x.UserId == userId).ToList();
+                userInfo.userControllerMappings = userControllers;
                 return userInfo;
             }
             catch (Exception ex)
@@ -163,11 +169,9 @@ namespace GISApi.Services
                                          select new UserProfileViewModel
                                          {
                                              UserId = u.Id,
-                                             //FirstName = u.FirstName,
-                                             //LastName = u.LastName,
+                                             FirstName = u.FirstName,
+                                             LastName = u.LastName,
                                              PhoneNumber = u.PhoneNumber,
-                                             //Position = u.Position,
-
                                          }).FirstOrDefaultAsync();
 
 

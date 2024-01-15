@@ -26,8 +26,6 @@ namespace GISApi.Controllers
     [AllowAnonymous]
     public class RoleController : ControllerBase
     {
-        private readonly ICommonService _commonService;
-
         private readonly ILogger<UsersController> _logger;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
@@ -48,7 +46,7 @@ IRolesService roleService, ILogger<UsersController> logger, RoleManager<Identity
             _roleManager = roleManager;
             _appDbContext = appDbContext;
             _webHostEnvironment = hostingEnvironment;
-            _roleService = roleService; _commonService = commonService;
+            _roleService = roleService; 
 
         }
 
@@ -94,16 +92,6 @@ IRolesService roleService, ILogger<UsersController> logger, RoleManager<Identity
         {
             try
             {
-                var token = Request.Headers["Authorization"];
-                string userId = User.Claims.Single(c => c.Type == ClaimTypes.PrimarySid).Value;
-                if (!_commonService.ValidateToken(token, userId))
-                {
-                    ModelState.AddModelError("ERROR", "Someone else is logged in with this UserID.");
-                    return StatusCode(StatusCodes.Status406NotAcceptable, new CustomBadRequest(ModelState));
-                }
-
-
-
                 RoleViewModel user = await _roleService.GetRoleById(id);
                 if (user == null)
                     return NotFound();
@@ -167,15 +155,6 @@ IRolesService roleService, ILogger<UsersController> logger, RoleManager<Identity
         {
             try
             {
-                var token = Request.Headers["Authorization"];
-                string userId = User.Claims.Single(c => c.Type == ClaimTypes.PrimarySid).Value;
-                if (!_commonService.ValidateToken(token, userId))
-                {
-                    ModelState.AddModelError("ERROR", "Someone else is logged in with this UserID.");
-                    return StatusCode(StatusCodes.Status406NotAcceptable, new CustomBadRequest(ModelState));
-                }
-
-
                 var role = await _roleService.GetRoleById(id);
                 if (role == null)
                 {
@@ -208,15 +187,6 @@ IRolesService roleService, ILogger<UsersController> logger, RoleManager<Identity
         //[Authorize(Policy = "Permissions.Site Admin.User.AddUpdateDelete")]
         public async Task<ActionResult<OperationResult<RoleViewModel>>> Put(string id, [FromBody] RoleViewModel model)
         {
-            var token = Request.Headers["Authorization"];
-            string userId = User.Claims.Single(c => c.Type == ClaimTypes.PrimarySid).Value;
-            if (!_commonService.ValidateToken(token, userId))
-            {
-                ModelState.AddModelError("ERROR", "Someone else is logged in with this UserID.");
-                return StatusCode(StatusCodes.Status406NotAcceptable, new CustomBadRequest(ModelState));
-            }
-
-
             if (id != model.Id)
             {
                 return BadRequest();

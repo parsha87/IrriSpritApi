@@ -66,7 +66,7 @@ namespace GISApi.Services
 
                 //var usrroles = await _GlobalDBContext.Aspnetuserroles.Where(x => x.RoleId == roleId).ToListAsync();
                 //_GlobalDBContext.RemoveRange(usrroles);
-                await _GlobalDBContext.SaveChangesAsync();             
+              // await _GlobalDBContext.SaveChangesAsync();             
 
                 //List<AspNetRoleClaim> aspnetroleclaims = await _GlobalDBContext.AspNetRoleClaims.Where(x => x.RoleId == roleId).ToListAsync();
                 //_GlobalDBContext.RemoveRange(aspnetroleclaims);

@@ -32,6 +32,8 @@ public partial class GlobalDBContext : DbContext
 
     public virtual DbSet<ControllerTimeSetting> ControllerTimeSettings { get; set; }
 
+    public virtual DbSet<Country> Countries { get; set; }
+
     public virtual DbSet<CyclicSequenceSetting> CyclicSequenceSettings { get; set; }
 
     public virtual DbSet<FilterSequenceSetting> FilterSequenceSettings { get; set; }

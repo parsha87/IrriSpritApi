@@ -70,6 +70,9 @@ public partial class AspNetUser
     public string? RoleId { get; set; }
 
     [StringLength(256)]
+    public string? RoleName { get; set; }
+
+    [StringLength(256)]
     public string? ParentId { get; set; }
 
     public bool? IsParent { get; set; }

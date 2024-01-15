@@ -1,7 +1,9 @@
-﻿using GISApi.Data;
+﻿using GISApi.Controllers;
+using GISApi.Data;
 using GISApi.Data.GlobalEntities;
 using GISApi.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace GISApi.Services
 {
@@ -11,20 +13,26 @@ namespace GISApi.Services
         Task<List<ControllerMaster>> GetControllerMaster();
         Task<ControllerMaster> GetControllerMasterId(int controllerId);
         Task<ControllerMaster> AddControllerMaster(ControllerMaster model);
-        Task<ControllerMaster> EdirControllerMaster(ControllerMaster model);
+        Task<ControllerMaster> EditControllerMaster(ControllerMaster model);
         Task<bool> DeleteControllerMaster(int controllerId);
+
+        Task<List<UserControllerMapping>> GetControllersByUserId(string userId);
     }
 
 
 
 
-    public class ControllerMasterService: IControllerMasterService
+    public class ControllerMasterService : IControllerMasterService
     {
-        private readonly GlobalDBContext _globalDBContext;
+        private readonly ILogger<ControllerMasterService> _logger;
 
-        public ControllerMasterService(GlobalDBContext globalDBContext)
+        private readonly GlobalDBContext _globalDBContext;
+        private GlobalDBContext _GlobalDBContext;
+
+        public ControllerMasterService(GlobalDBContext globalDBContext, ILogger<ControllerMasterService> logger)
         {
             _globalDBContext = globalDBContext;
+            _logger = logger;
         }
 
         public async Task<ControllerMaster> AddControllerMaster(ControllerMaster model)
@@ -36,19 +44,31 @@ namespace GISApi.Services
 
                 return model;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                _logger.LogError("[" + nameof(ControllerMasterService) + "." + nameof(AddControllerMaster) + "]" + ex);
+                throw ex;
             }
         }
 
-        public Task<bool> DeleteControllerMaster(int controllerId)
+        public async Task<bool> DeleteControllerMaster(int controllerId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _GlobalDBContext.ControllerMasters.Where(x => x.Id == controllerId).FirstOrDefaultAsync();
+                _GlobalDBContext.Remove(result);
+                await _GlobalDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[" + nameof(ControllerMasterService) + "." + nameof(DeleteControllerMaster) + "]" + ex);
+
+                throw ex;
+            }
         }
 
-        public async Task<ControllerMaster> EdirControllerMaster(ControllerMaster model)
+        public async Task<ControllerMaster> EditControllerMaster(ControllerMaster model)
         {
             try
             {
@@ -57,10 +77,11 @@ namespace GISApi.Services
 
                 return model;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError("[" + nameof(ControllerMasterService) + "." + nameof(EditControllerMaster) + "]" + ex);
 
-                throw;
+                throw ex;
             }
         }
 
@@ -69,14 +90,15 @@ namespace GISApi.Services
             try
             {
                 List<ControllerMaster> controllerMasters = new List<ControllerMaster>();
-                controllerMasters = await _globalDBContext.ControllerMasters.ToListAsync();
+                controllerMasters = await _globalDBContext.ControllerMasters.Where(x => x.IsAssigned == false).ToListAsync();
                 return controllerMasters;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError("[" + nameof(ControllerMasterService) + "." + nameof(GetControllerMaster) + "]" + ex);
 
-                throw;
+                throw ex;
             }
         }
 
@@ -88,10 +110,26 @@ namespace GISApi.Services
                 model = await _globalDBContext.ControllerMasters.Where(x => x.Id == controllerId).FirstOrDefaultAsync();
                 return model;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError("[" + nameof(ControllerMasterService) + "." + nameof(GetControllerMasterId) + "]" + ex);
+                throw ex;
+            }
+        }
 
-                throw;
+
+        public async Task<List<UserControllerMapping>> GetControllersByUserId(string userId)
+        {
+            try
+            {
+                List<UserControllerMapping> modelList = new List<UserControllerMapping>();
+                modelList = await _globalDBContext.UserControllerMappings.Where(x => x.UserId == userId).ToListAsync();
+                return modelList;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("[" + nameof(ControllerMasterService) + "." + nameof(GetControllersByUserId) + "]" + ex);
+                throw ex;
             }
         }
     }

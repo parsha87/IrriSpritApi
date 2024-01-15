@@ -6,16 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GISApi.Data.GlobalEntities;
 
-[Table("ControllerMaster")]
-public partial class ControllerMaster
+[Table("Country")]
+public partial class Country
 {
     [Key]
     public int Id { get; set; }
 
-    [StringLength(100)]
-    public string? ControllerNo { get; set; }
+    [StringLength(500)]
+    public string? CountryName { get; set; }
 
     public bool? IsActive { get; set; }
-
-    public bool? IsAssigned { get; set; }
 }

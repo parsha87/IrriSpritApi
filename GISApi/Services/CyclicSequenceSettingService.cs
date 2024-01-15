@@ -17,6 +17,7 @@ namespace GISApi.Services
     public class CyclicSequenceSettingService : ICyclicSequenceSettingService
     {
         private readonly GlobalDBContext _globalDBContext;
+        private GlobalDBContext _GlobalDBContext;
 
         public CyclicSequenceSettingService(GlobalDBContext globalDBContext)
         {
@@ -37,9 +38,20 @@ namespace GISApi.Services
             }
         }
 
-        public Task<bool> DeleteCyclicSequenceService(int cyclicId)
+        public async Task<bool> DeleteCyclicSequenceService(int cyclicId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _GlobalDBContext.CyclicSequenceSettings.Where(x => x.Id == cyclicId).FirstOrDefaultAsync();
+                _GlobalDBContext.Remove(result);
+                await _GlobalDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
 
         public async Task<CyclicSequenceSetting> EditCyclicSequenceSetting(CyclicSequenceSetting model)

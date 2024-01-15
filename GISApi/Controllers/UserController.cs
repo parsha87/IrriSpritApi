@@ -32,7 +32,6 @@ namespace GISApi.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ICommonService _commonService;
-
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<UsersController> _logger;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -95,7 +94,7 @@ namespace GISApi.Controllers
         }
 
 
-        
+
         /// <summary>
         /// Get users by id
         /// </summary>
@@ -128,7 +127,7 @@ namespace GISApi.Controllers
                 _logger.LogError("[" + nameof(UsersController) + "." + nameof(Get) + "]" + ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
-        }        
+        }
 
         /// <summary>
         /// Edit User
@@ -171,7 +170,7 @@ namespace GISApi.Controllers
                     try
                     {
                         var user = await _userManager.FindByIdAsync(model.Id);
-                        
+
                         //show proper error message to admin
                         if (user == null)
                         {
@@ -192,9 +191,8 @@ namespace GISApi.Controllers
                         user.IsActive = model.IsActive;
                         user.Address = model.Address;
                         user.PhoneNumber = model.PhoneNumber;
-                        user.RoleName = model.RoleName;                       
+                        user.RoleName = model.RoleName;
                         user.RoleId = model.RoleId;
-                        user.DisplayUserName = model.DisplayUserName;
                         user.Email = model.Email;
                         user.UserName = model.UserName;
                         var result = await _userManager.UpdateAsync(user);
@@ -299,12 +297,17 @@ namespace GISApi.Controllers
             {
                 return BadRequest(new CustomBadRequest(ModelState));
             }
-            //if (model.RoleId == "")
-            //{
-            //    ModelState.AddModelError("Error", "Assign atleast one role.");
-            //    return BadRequest(new CustomBadRequest(ModelState));
-            //}
+            if (model.RoleId == "")
+            {
+                ModelState.AddModelError("Error", "Assign atleast one role.");
+                return BadRequest(new CustomBadRequest(ModelState));
+            }
 
+            if (model.RoleName.ToLower() == "superadmin")
+            {
+                ModelState.AddModelError("Error", "Error.Dont try to hack application..:)");
+                return BadRequest(new CustomBadRequest(ModelState));
+            }
 
             var errors = new List<string>();
             try
@@ -323,8 +326,6 @@ namespace GISApi.Controllers
                             return BadRequest(new CustomBadRequest(ModelState));
                         }
 
-                        // var newUser = _mapper.Map<ApplicationUser>(model);
-
                         ApplicationUser user = new ApplicationUser();
                         try
                         {
@@ -337,11 +338,17 @@ namespace GISApi.Controllers
                                 Address = model.Address,
                                 PhoneNumber = model.PhoneNumber,
                                 EmailConfirmed = true,
+                                PhoneNumberConfirmed = true,
                                 IsActive = model.IsActive,
                                 RoleId = model.RoleId,
                                 RoleName = model.RoleName,
-                                DisplayUserName= model.DisplayUserName
-
+                                CountryId = model.CountryId,
+                                CountryName = model.CountryName,
+                                IsParent = model.IsParent,
+                                LanguageId = model.LanguageId,
+                                LanguageName = model.LanguageName,
+                                ParentId = model.ParentId,
+                                TimeZone = model.TimeZone,
                             };
                             var result = await _userManager.CreateAsync(user, model.Password);
                             if (!result.Succeeded)
@@ -356,23 +363,128 @@ namespace GISApi.Controllers
                                 //return BadRequest(new CustomBadRequest(ModelState));
                             }
                             model.Id = user.Id;
+                            //assign role
+
+                            var addRoleResult = await _userManager.AddToRoleAsync(user, model.RoleName);
+                            if (!addRoleResult.Succeeded)
+                            {
+                                //rollback
+                                transaction.Rollback();
+                                ModelState.AddModelError("Error", $"User not created.\nError occurred while assigning role:\n {addRoleResult.Errors.FirstOrDefault().Description}");
+                                return BadRequest(new CustomBadRequest(ModelState));
+                            }
+                            await _appDbContext.SaveChangesAsync();
+
+                            if (model.userControllerMappings.Count > 0)
+                            {
+                                var usrMappings = _globalDBContext.UserControllerMappings.Where(x => x.UserId == user.Id).ToList();
+                                _globalDBContext.UserControllerMappings.RemoveRange(usrMappings);
+                                await _globalDBContext.SaveChangesAsync();
+
+                                await _globalDBContext.UserControllerMappings.AddRangeAsync(model.userControllerMappings);
+                                await _globalDBContext.SaveChangesAsync();
+
+                                var usrMappingsFinalIds = _globalDBContext.UserControllerMappings.Where(x => x.UserId == user.Id).Select(x=>x.Id).ToList();
+                                var controlerMasters = _globalDBContext.ControllerMasters.Where(x => usrMappingsFinalIds.Contains(x.Id)).ToList();
+                                foreach (var item in controlerMasters)
+                                {
+                                    item.IsAssigned = true;
+                                }
+                                _globalDBContext.ControllerMasters.UpdateRange(controlerMasters);
+                                await _globalDBContext.SaveChangesAsync();
+
+                            }
                         }
                         catch (Exception ex)
                         {
                             _logger.LogError("Error occured in [AccountController] - RegisterUser() - CreateAsync() - User:" + user.Email + ". Exception is : " + ex);
                         }
 
-                       //assign role
 
-                        var addRoleResult = await _userManager.AddToRoleAsync(user, model.RoleName);
-                        if (!addRoleResult.Succeeded)
+                        //Add subuser if any
+                        if (model.SubUserEmail != "" && model.SubUserPhoneNo != "")
                         {
-                            //rollback
-                            transaction.Rollback();
-                            ModelState.AddModelError("Error", $"User not created.\nError occurred while assigning role:\n {addRoleResult.Errors.FirstOrDefault().Description}");
-                            return BadRequest(new CustomBadRequest(ModelState));
+                            model.Id = "";
+                            if (!_globalDBContext.AspNetUsers.Any(x => x.UserName == model.SubUserEmail))
+                            {
+                                ApplicationUser subuser = new ApplicationUser();
+                                try
+                                {
+                                    subuser = new ApplicationUser
+                                    {
+                                        UserName = model.SubUserEmail,
+                                        Email = model.SubUserEmail,
+                                        FirstName = model.SubUserFirstName,
+                                        LastName = model.SubUserLastName,
+                                        Address = model.Address,
+                                        PhoneNumber = model.SubUserPhoneNo,
+                                        EmailConfirmed = true,
+                                        PhoneNumberConfirmed = true,
+                                        IsActive = model.IsActive,
+                                        RoleId = model.RoleId,
+                                        RoleName = model.RoleName,
+                                        CountryId = model.CountryId,
+                                        CountryName = model.CountryName,
+                                        IsParent = model.IsParent,
+                                        LanguageId = model.LanguageId,
+                                        LanguageName = model.LanguageName,
+                                        ParentId = model.ParentId,
+                                        TimeZone = model.TimeZone,
+                                    };
+                                    var result = await _userManager.CreateAsync(subuser, model.Password);
+                                    if (!result.Succeeded)
+                                    {
+                                        foreach (var error in result.Errors)
+                                        {
+                                            ModelState.AddModelError("ERROR", error.Description);
+                                        }
+                                        return BadRequest(new CustomBadRequest(ModelState));
+                                    }
+                                    model.Id = subuser.Id;
+
+                                    //assign role
+                                    var addRoleResultSubUser = await _userManager.AddToRoleAsync(subuser, model.RoleName);
+                                    if (!addRoleResultSubUser.Succeeded)
+                                    {
+                                        //rollback
+                                        transaction.Rollback();
+                                        ModelState.AddModelError("Error", $"User not created.\nError occurred while assigning role:\n {addRoleResultSubUser.Errors.FirstOrDefault().Description}");
+                                        return BadRequest(new CustomBadRequest(ModelState));
+                                    }
+                                    await _appDbContext.SaveChangesAsync();
+
+                                    //Add Controllers mapping
+                                    if (model.userControllerMappings.Count > 0)
+                                    {
+                                        var usrMappings = _globalDBContext.UserControllerMappings.Where(x => x.UserId == subuser.Id).ToList();
+                                        _globalDBContext.UserControllerMappings.RemoveRange(usrMappings);
+                                        await _globalDBContext.SaveChangesAsync();
+
+                                        await _globalDBContext.UserControllerMappings.AddRangeAsync(model.userControllerMappings);
+                                        await _globalDBContext.SaveChangesAsync();
+
+                                        var usrMappingsFinalIds = _globalDBContext.UserControllerMappings.Where(x => x.UserId == subuser.Id).Select(x => x.Id).ToList();
+                                        var controlerMasters = _globalDBContext.ControllerMasters.Where(x => usrMappingsFinalIds.Contains(x.Id)).ToList();
+                                        foreach (var item in controlerMasters)
+                                        {
+                                            item.IsAssigned = true;
+                                        }
+                                        _globalDBContext.ControllerMasters.UpdateRange(controlerMasters);
+                                        await _globalDBContext.SaveChangesAsync();
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError("Error occured in [AccountController] - RegisterUser() - CreateAsync() - User:" + user.Email + ". Exception is : " + ex);
+                                }
+                            }
+                            {
+                                //Return error subuser already exists
+                                ModelState.AddModelError("Error", $"Sub User not created. Same Email already exists\nError occurred while adding User:");
+                                return BadRequest(new CustomBadRequest(ModelState));
+                            }
+
                         }
-                        await _appDbContext.SaveChangesAsync();
 
 
                         transaction.Commit();
@@ -406,7 +518,7 @@ namespace GISApi.Controllers
             try
             {
                 var token = Request.Headers["Authorization"];
-               // string userId = User.Claims.Single(c => c.Type == ClaimTypes.PrimarySid).Value;
+                // string userId = User.Claims.Single(c => c.Type == ClaimTypes.PrimarySid).Value;
                 if (!_commonService.ValidateToken(token, userId))
                 {
                     ModelState.AddModelError("ERROR", "Someone else is logged in with this UserID.");
@@ -554,7 +666,7 @@ namespace GISApi.Controllers
                 }
 
 
-               // string userId = User.Claims.Single(c => c.Type == ClaimTypes.PrimarySid).Value;
+                // string userId = User.Claims.Single(c => c.Type == ClaimTypes.PrimarySid).Value;
                 UserProfileViewModel userViewModel = await _userService.GetUserProfileById(userId);
                 if (userViewModel == null)
                     return NotFound();

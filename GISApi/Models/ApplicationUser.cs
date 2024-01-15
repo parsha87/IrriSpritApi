@@ -17,7 +17,14 @@ namespace GISApi.Models
         public string RoleId { get; set; }
         public string Address { get; set; }       
         public string RoleName { get; set; }       
-        public string? DisplayUserName { get; set; }
+        public bool PhoneNumberConfirmed { get; set; }
+        public int CountryId { get; set; }
+        public string CountryName { get; set; }
+        public string TimeZone { get; set; }
+        public int LanguageId { get; set; }
+        public string LanguageName { get; set; }
+        public string ParentId { get; set; }
+        public bool IsParent { get; set; }
 
 
 

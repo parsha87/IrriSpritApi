@@ -17,6 +17,7 @@ namespace GISApi.Services
     public class ControllerTimeSettingService : IControllerTimeSettingService
     {
         private readonly GlobalDBContext _globalDBContext;
+        private GlobalDBContext _GlobalDBContext;
 
         public ControllerTimeSettingService(GlobalDBContext globalDBContext)
         {
@@ -38,9 +39,20 @@ namespace GISApi.Services
             }
         }
 
-        public Task<bool> DeleteControllerTimeSetting(int timesettingId)
+        public async Task<bool> DeleteControllerTimeSetting(int timesettingId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _GlobalDBContext.ControllerTimeSettings.Where(x => x.Id == timesettingId).FirstOrDefaultAsync();
+                _GlobalDBContext.Remove(result);
+                await _GlobalDBContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
         }
 
         public async Task<ControllerTimeSetting> EditTimeSetting(ControllerTimeSetting model)
