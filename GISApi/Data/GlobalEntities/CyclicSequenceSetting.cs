@@ -43,6 +43,8 @@ public partial class CyclicSequenceSetting
     [StringLength(500)]
     public string ControllerNo { get; set; } = null!;
 
+    public int? ControllerId { get; set; }
+
     [Column("StartTime_Min")]
     [StringLength(500)]
     public string? StartTimeMin { get; set; }

@@ -71,4 +71,6 @@ public partial class SequenceSetting
     [Column("Usermobile_IMEINo")]
     [StringLength(500)]
     public string? UsermobileImeino { get; set; }
+
+    public int? ContollerId { get; set; }
 }

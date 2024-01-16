@@ -66,8 +66,7 @@ namespace GISApi.Controllers
             try
             {
                 List<UserControllerMapping> modeList= await _controllerMasterService.GetControllersByUserId(id);
-                if (modeList == null)
-                    return NotFound();
+             
 
                 return Ok(modeList);
             }

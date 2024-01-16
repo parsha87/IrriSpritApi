@@ -32,7 +32,9 @@ public partial class FilterSequenceSetting
     public string UserId { get; set; } = null!;
 
     [StringLength(500)]
-    public string ControllerId { get; set; } = null!;
+    public string? ControllerNo { get; set; }
+
+    public int ControllerId { get; set; }
 
     [Column("FlushTime_sec")]
     [StringLength(500)]

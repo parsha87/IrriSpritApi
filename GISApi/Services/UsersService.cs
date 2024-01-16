@@ -15,7 +15,7 @@ namespace GISApi.Services
 {
     public interface IUserService
     {
-        Task<List<AddEditUserViewModel>> GetUsers(bool? status, int organizationId, string roleName);
+        Task<List<AddEditUserViewModel>> GetUsers(bool? status);
 
         Task<AddEditUserViewModel> GetUserById(string userId);
 
@@ -56,45 +56,23 @@ namespace GISApi.Services
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
-        public async Task<List<AddEditUserViewModel>> GetUsers(bool? status, int organizationId, string roleName)
+        public async Task<List<AddEditUserViewModel>> GetUsers(bool? status)
         {
             try
             {
-                if (roleName == "SuperAdmin")
-                {
-                    var userList = (from x in _GlobalDBContext.AspNetUsers
-                                    select new AddEditUserViewModel
-                                    {
-                                        Id = x.Id,
-                                        UserName = x.UserName,
-                                        Email = x.Email,
-                                        //LastName = x.LastName,
-                                        //FirstName = x.FirstName,
-                                        //RoleId = x.RoleId,
-                                        //RoleName = x.RoleName,
-                                        //IsActive = (bool)x.IsActive,
-                                        //PhoneNumber = x.PhoneNumber,
-                                        //Address = x.Address,                                        
-                                        //DisplayUserName = x.DisplayUserName,
-                                    }).AsQueryable();
-
-                    return userList.Where(x => x.RoleName != "SuperAdmin").ToList();
-                }
-
-
                 var userLists = (from x in _GlobalDBContext.AspNetUsers
                                  select new AddEditUserViewModel
                                  {
                                      Id = x.Id,
                                      UserName = x.UserName,
                                      Email = x.Email,
-                                     //LastName = x.LastName,
-                                     //FirstName = x.FirstName,
-                                     //RoleId = x.RoleId,
-                                     //RoleName = x.RoleName,
-                                     //IsActive = (bool)x.IsActive,
-                                     //PhoneNumber = x.PhoneNumber,
-                                     //Address = x.Address,
+                                     LastName = x.LastName,
+                                     FirstName = x.FirstName,
+                                     RoleId = x.RoleId,
+                                     RoleName = x.RoleName,
+                                     IsActive = (bool)x.IsActive,
+                                     PhoneNumber = x.PhoneNumber,
+                                     Address = x.Address,
                                      //DisplayUserName = x.DisplayUserName
                                  });
 

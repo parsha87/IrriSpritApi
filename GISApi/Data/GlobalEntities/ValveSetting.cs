@@ -47,9 +47,9 @@ public partial class ValveSetting
     [StringLength(500)]
     public string CoValveNo3 { get; set; } = null!;
 
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
-    public int ControllerNo { get; set; }
+    public string ControllerNo { get; set; }
 
     [Column("Duration_MM")]
     [StringLength(500)]
@@ -85,4 +85,6 @@ public partial class ValveSetting
     [Column("Usermobile_IMEINo")]
     [StringLength(500)]
     public string? UsermobileImeino { get; set; }
+
+    public int? ControllerId { get; set; }
 }

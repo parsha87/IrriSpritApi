@@ -8,10 +8,11 @@ namespace GISApi.Services
     public interface IMaxFiltervalveSettingService
     {
         Task<List<MaxFiltervalveSetting>> GetMaxFiltervalveSetting();
-        Task<MaxFiltervalveSetting> GetFiltervalveSettingId(int filterValveId);
+        Task<MaxFiltervalveSetting> GetMaxFiltervalveSettingId(int filterValveId);
         Task<MaxFiltervalveSetting> AddMaxFiltervalveSetting(MaxFiltervalveSetting model);
         Task<MaxFiltervalveSetting> EditMaxFiltervalveSetting(MaxFiltervalveSetting model);
         Task<bool> DeleteMaxFiltervalveSetting(int filterValveId);
+        Task<MaxFiltervalveSetting> GetDataByControllerId(int controllerId);
     }
     public class MaxFiltervalveSettingService: IMaxFiltervalveSettingService
     {
@@ -68,7 +69,7 @@ namespace GISApi.Services
             }
         }
 
-        public async Task<MaxFiltervalveSetting> GetFiltervalveSettingId(int filterValveId)
+        public async Task<MaxFiltervalveSetting> GetMaxFiltervalveSettingId(int filterValveId)
         {
             try
             {
@@ -90,6 +91,20 @@ namespace GISApi.Services
                 MaxFiltervalveSettings = await _globalDBContext.MaxFiltervalveSettings.ToListAsync();
                 return MaxFiltervalveSettings;
 
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<MaxFiltervalveSetting> GetDataByControllerId(int controllerId)
+        {
+            try
+            {
+                MaxFiltervalveSetting model = new MaxFiltervalveSetting();
+                model = await _globalDBContext.MaxFiltervalveSettings.Where(x => x.ControllerId == controllerId).FirstOrDefaultAsync();
+                return model;
             }
             catch (Exception ex)
             {

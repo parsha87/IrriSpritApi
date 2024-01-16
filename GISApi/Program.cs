@@ -181,6 +181,11 @@ builder.Services.AddTransient<IRolesService, RolesService>();
 builder.Services.AddTransient<IUserService, UsersService>();
 builder.Services.AddScoped<IJwtFactory, JwtFactory>();
 builder.Services.AddScoped<ICommonService, CommonService>();
+builder.Services.AddScoped<IControllerTimeSettingService, ControllerTimeSettingService>();
+builder.Services.AddScoped<ICyclicSequenceSettingService, CyclicSequenceSettingService>();
+builder.Services.AddScoped<IFilterSequenceSettingService, FilterSequenceSettingService>();
+builder.Services.AddScoped<IMaxFiltervalveSettingService, MaxFiltervalveSettingService>();
+builder.Services.AddScoped<IValveSettingService, ValveSettingService>();
 
 
 //Cors setting

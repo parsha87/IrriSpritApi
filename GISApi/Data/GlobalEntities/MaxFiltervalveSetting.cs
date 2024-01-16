@@ -40,6 +40,8 @@ public partial class MaxFiltervalveSetting
     [StringLength(500)]
     public string ControllerNo { get; set; } = null!;
 
+    public int? ControllerId { get; set; }
+
     [Column("Usermobile_IMEINo")]
     [StringLength(500)]
     public string? UsermobileImeino { get; set; }

@@ -12,7 +12,9 @@ namespace GISApi.Services
         Task<CyclicSequenceSetting> GetCyclicSequenceSettingId(int cyclicId);
         Task<CyclicSequenceSetting> AddCyclicSequenceSetting(CyclicSequenceSetting model);
         Task<CyclicSequenceSetting> EditCyclicSequenceSetting(CyclicSequenceSetting model);
-        Task <bool>DeleteCyclicSequenceService(int cyclicId);     
+        Task <bool>DeleteCyclicSequenceService(int cyclicId);
+
+        Task<CyclicSequenceSetting> GetDataByControllerId(int controllerId);
     }
     public class CyclicSequenceSettingService : ICyclicSequenceSettingService
     {
@@ -100,7 +102,21 @@ namespace GISApi.Services
                 throw;
             }
         }
-       
+
+        public async Task<CyclicSequenceSetting> GetDataByControllerId(int controllerId)
+        {
+            try
+            {
+                CyclicSequenceSetting model = new CyclicSequenceSetting();
+                model = await _globalDBContext.CyclicSequenceSettings.Where(x => x.ControllerId == controllerId).FirstOrDefaultAsync();
+                return model;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
     }  
   
     

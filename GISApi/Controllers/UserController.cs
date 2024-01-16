@@ -68,23 +68,7 @@ namespace GISApi.Controllers
         {
             try
             {
-                var token = Request.Headers["Authorization"];
-                string userId = User.Claims.Single(c => c.Type == ClaimTypes.PrimarySid).Value;
-                if (!_commonService.ValidateToken(token, userId))
-                {
-                    ModelState.AddModelError("ERROR", "Someone else is logged in with this UserID.");
-                    return StatusCode(StatusCodes.Status406NotAcceptable, new CustomBadRequest(ModelState));
-                }
-
-
-                //var roles = ((ClaimsIdentity)User.Identity).Claims
-                //.Where(c => c.Type == ClaimTypes.Role)
-                //.Select(c => c.Value);
-                string roleName = User.Claims.Single(c => c.Type == ClaimTypes.Role).Value;
-                var organizationId = User.Claims.Single(c => c.Type == CustomClaimTypes.OrganisationId).Value;
-                int OrganisationId = Convert.ToInt32(organizationId);
-
-                List<AddEditUserViewModel> users = await _userService.GetUsers(status, OrganisationId, roleName);
+                List<AddEditUserViewModel> users = await _userService.GetUsers(status);
                 return Ok(users.OrderBy(x => x.FirstName));
             }
             catch (Exception ex)
