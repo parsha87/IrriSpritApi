@@ -56,11 +56,9 @@ namespace GISApi.Controllers
         {
             try
             {
-                MaxFiltervalveSetting model = await _service.GetMaxFiltervalveSettingId(id);
-                if (model == null)
-                    return NotFound();
-
-                return Ok(model);
+              List<MaxFiltervalveSetting> list = await _service.GetMaxFiltervalveSetting();
+               
+                return Ok(list);
             }
             catch (Exception ex)
             {
@@ -75,11 +73,11 @@ namespace GISApi.Controllers
         /// <param name="id">User id</param>
         /// <returns>User model</returns>
         [HttpGet("MaxFiltervalveByControllerId/{id}")]
-        public async Task<ActionResult<MaxFiltervalveSetting>> GetMaxFiltervalveByControllerId(int id)
+        public async Task<IActionResult> GetMaxFiltervalveByControllerId(int id)
         {
             try
             {
-                MaxFiltervalveSetting model = await _service.GetDataByControllerId(id);
+                List<MaxFiltervalveSetting> model = await _service.GetDataByControllerId(id);
                 return Ok(model);
             }
             catch (Exception ex)

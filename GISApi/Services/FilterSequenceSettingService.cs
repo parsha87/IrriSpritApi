@@ -12,7 +12,7 @@ namespace GISApi.Services
         Task<FilterSequenceSetting> AddFilterSequenceSetting(FilterSequenceSetting model);
         Task<FilterSequenceSetting> EditFilterSequenceSetting(FilterSequenceSetting model);
         Task<bool> DeleteFilterSequenceSetting(int filterId);
-        Task<FilterSequenceSetting> GetDataByControllerId(int controllerId);
+        Task<List<FilterSequenceSetting>> GetDataByControllerId(int controllerId);
     }
     public class FilterSequenceSettingService : IFilterSequenceSettingService
     {
@@ -98,12 +98,12 @@ namespace GISApi.Services
             }
         }
 
-        public async Task<FilterSequenceSetting> GetDataByControllerId(int controllerId)
+        public async Task<List<FilterSequenceSetting>> GetDataByControllerId(int controllerId)
         {
             try
             {
-                FilterSequenceSetting model = new FilterSequenceSetting();
-                model = await _globalDBContext.FilterSequenceSettings.Where(x => x.ControllerId == controllerId).FirstOrDefaultAsync();
+                List<FilterSequenceSetting> model = new List< FilterSequenceSetting>();
+                model = await _globalDBContext.FilterSequenceSettings.Where(x => x.ControllerId == controllerId).ToListAsync();
                 return model;
             }
             catch (Exception ex)

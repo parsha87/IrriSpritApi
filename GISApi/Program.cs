@@ -186,6 +186,7 @@ builder.Services.AddScoped<ICyclicSequenceSettingService, CyclicSequenceSettingS
 builder.Services.AddScoped<IFilterSequenceSettingService, FilterSequenceSettingService>();
 builder.Services.AddScoped<IMaxFiltervalveSettingService, MaxFiltervalveSettingService>();
 builder.Services.AddScoped<IValveSettingService, ValveSettingService>();
+builder.Services.AddScoped<ISequenceSettingService, SequenceSettingService>();
 
 
 //Cors setting

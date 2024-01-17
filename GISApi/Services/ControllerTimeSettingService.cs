@@ -13,7 +13,7 @@ namespace GISApi.Services
         Task<ControllerTimeSetting> AddTimeSetting(ControllerTimeSetting timesetting);
         Task<ControllerTimeSetting> EditTimeSetting(ControllerTimeSetting model);
         Task<bool> DeleteControllerTimeSetting(int timesettingId);
-        Task<ControllerTimeSetting> GetDataByControllerId(int controllerId);
+        Task<List<ControllerTimeSetting>> GetDataByControllerId(int controllerId);
     }
     public class ControllerTimeSettingService : IControllerTimeSettingService
     {
@@ -100,12 +100,12 @@ namespace GISApi.Services
                 throw;
             }
         }
-        public async Task<ControllerTimeSetting> GetDataByControllerId(int controllerId)
+        public async Task<List<ControllerTimeSetting>> GetDataByControllerId(int controllerId)
         {
             try
             {
-                ControllerTimeSetting model = new ControllerTimeSetting();
-                model = await _globalDBContext.ControllerTimeSettings.Where(x => x.ControllerId == controllerId).FirstOrDefaultAsync();
+                List<ControllerTimeSetting> model = new List<ControllerTimeSetting>();
+                model = await _globalDBContext.ControllerTimeSettings.Where(x => x.ControllerId == controllerId).ToListAsync();
                 return model;
             }
             catch (Exception ex)

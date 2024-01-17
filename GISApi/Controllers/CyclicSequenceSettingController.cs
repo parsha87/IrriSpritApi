@@ -58,7 +58,7 @@ namespace GISApi.Controllers
             try
             {
                 CyclicSequenceSetting model = await _service.GetCyclicSequenceSettingId(id);
-             
+
 
                 return Ok(model);
             }
@@ -76,13 +76,11 @@ namespace GISApi.Controllers
         /// <returns>User model</returns>
         [HttpGet("CyclicSequenceByControllerId/{id}")]
         //[Authorize(Policy = "Permissions.Site Admin.User.ReadOnly,Permissions.Site Admin.User.AddUpdateDelete")]
-        public async Task<ActionResult<CyclicSequenceSetting>> GetCyclicSequencegByControllerId(int id)
+        public async Task<IActionResult> GetCyclicSequencegByControllerId(int id)
         {
             try
             {
-                CyclicSequenceSetting model = await _service.GetDataByControllerId(id);
-              
-
+                List<CyclicSequenceSetting> model = await _service.GetDataByControllerId(id);
                 return Ok(model);
             }
             catch (Exception ex)

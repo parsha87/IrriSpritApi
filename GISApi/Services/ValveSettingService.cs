@@ -12,7 +12,7 @@ namespace GISApi.Services
         Task<ValveSetting> AddValveSetting(ValveSetting model);
         Task<ValveSetting> EditValveSetting(ValveSetting model);
         Task<bool> DeleteValveSetting(int valveId);
-        Task<ValveSetting> GetDataByControllerId(int controllerId);
+        Task<List<ValveSetting>> GetDataByControllerId(int controllerId);
     }
     public class ValveSettingService: IValveSettingService
     {
@@ -98,12 +98,12 @@ namespace GISApi.Services
             }
         }
 
-        public async Task<ValveSetting> GetDataByControllerId(int controllerId)
+        public async Task<List<ValveSetting>> GetDataByControllerId(int controllerId)
         {
             try
             {
-                ValveSetting model = new ValveSetting();
-                model = await _globalDBContext.ValveSettings.Where(x => x.ControllerId == controllerId).FirstOrDefaultAsync();
+                List<ValveSetting> model = new List<ValveSetting>();
+                model = await _globalDBContext.ValveSettings.Where(x => x.ControllerId == controllerId).ToListAsync();
                 return model;
             }
             catch (Exception ex)

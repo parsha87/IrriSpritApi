@@ -75,12 +75,12 @@ namespace GISApi.Controllers
         /// <param name="id">User id</param>
         /// <returns>User model</returns>
         [HttpGet("ValveSettingByControllerId/{id}")]
-        public async Task<ActionResult<ValveSetting>> GetValveSettingByControllerId(int id)
+        public async Task<IActionResult> GetValveSettingByControllerId(int id)
         {
             try
             {
-                ValveSetting model = await _service.GetDataByControllerId(id);
-                return Ok(model);
+              List<ValveSetting> list = await _service.GetDataByControllerId(id);
+                return Ok(list);
             }
             catch (Exception ex)
             {

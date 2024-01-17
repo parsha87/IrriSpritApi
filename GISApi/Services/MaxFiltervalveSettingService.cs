@@ -1,4 +1,5 @@
-﻿using GISApi.Data;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using GISApi.Data;
 using GISApi.Data.GlobalEntities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,7 @@ namespace GISApi.Services
         Task<MaxFiltervalveSetting> AddMaxFiltervalveSetting(MaxFiltervalveSetting model);
         Task<MaxFiltervalveSetting> EditMaxFiltervalveSetting(MaxFiltervalveSetting model);
         Task<bool> DeleteMaxFiltervalveSetting(int filterValveId);
-        Task<MaxFiltervalveSetting> GetDataByControllerId(int controllerId);
+        Task<List<MaxFiltervalveSetting>> GetDataByControllerId(int controllerId);
     }
     public class MaxFiltervalveSettingService: IMaxFiltervalveSettingService
     {
@@ -98,12 +99,12 @@ namespace GISApi.Services
             }
         }
 
-        public async Task<MaxFiltervalveSetting> GetDataByControllerId(int controllerId)
+        public async Task<List<MaxFiltervalveSetting>> GetDataByControllerId(int controllerId)
         {
             try
             {
-                MaxFiltervalveSetting model = new MaxFiltervalveSetting();
-                model = await _globalDBContext.MaxFiltervalveSettings.Where(x => x.ControllerId == controllerId).FirstOrDefaultAsync();
+               List< MaxFiltervalveSetting> model = new  List <MaxFiltervalveSetting>();
+                model = await _globalDBContext.MaxFiltervalveSettings.Where(x => x.ControllerId == controllerId).ToListAsync();
                 return model;
             }
             catch (Exception ex)

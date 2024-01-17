@@ -72,5 +72,5 @@ public partial class SequenceSetting
     [StringLength(500)]
     public string? UsermobileImeino { get; set; }
 
-    public int? ContollerId { get; set; }
+    public int? ControllerId { get; set; }
 }

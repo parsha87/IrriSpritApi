@@ -76,11 +76,11 @@ namespace GISApi.Controllers
         /// <returns>User model</returns>
         [HttpGet("ControllerTimeSettingByControllerId/{id}")]
         //[Authorize(Policy = "Permissions.Site Admin.User.ReadOnly,Permissions.Site Admin.User.AddUpdateDelete")]
-        public async Task<ActionResult<ControllerTimeSetting>> GetControllerTimeSettingByControllerId(int id)
+        public async Task<IActionResult> GetControllerTimeSettingByControllerId(int id)
         {
             try
             {
-                ControllerTimeSetting model = await _service.GetDataByControllerId(id);
+                List<ControllerTimeSetting> model = await _service.GetDataByControllerId(id);
                
 
                 return Ok(model);

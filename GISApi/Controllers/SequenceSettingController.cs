@@ -11,15 +11,14 @@ namespace GISApi.Controllers
 {
     [EnableCors("AllowSpecificOrigin")]
     [Route("api/[controller]")]
-    [ApiController]
-    [AllowAnonymous]
-    public class FilterSequenceSettingController : ControllerBase
+    
+    public class SequenceSettingController : ControllerBase
     {
-        private readonly ILogger<FilterSequenceSettingController> _logger;
+        private readonly ILogger<SequenceSettingController> _logger;
         private readonly IMapper _mapper;
-        private readonly IFilterSequenceSettingService _service;
+        private readonly ISequenceSettingService _service;
 
-        public FilterSequenceSettingController(ILogger<FilterSequenceSettingController> logger, IMapper mapper, IFilterSequenceSettingService service)
+        public SequenceSettingController(ILogger<SequenceSettingController> logger, IMapper mapper, ISequenceSettingService service)
         {
             _logger = logger;
             _mapper = mapper;
@@ -31,16 +30,16 @@ namespace GISApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<FilterSequenceSetting>>> GetFilterSequenceSetting()
+        public async Task<ActionResult<List<SequenceSetting>>> GetSequenceSetting()
         {
             try
             {
-                List<FilterSequenceSetting> list = await _service.GetFilterSequenceSetting();
+                List<SequenceSetting> list = await _service.GetSequenceSetting();
                 return Ok(list);
             }
             catch (Exception ex)
             {
-                _logger.LogError("[" + nameof(FilterSequenceSettingController) + "." + nameof(GetFilterSequenceSetting) + "]" + ex);
+                _logger.LogError("[" + nameof(SequenceSettingController) + "." + nameof(GetSequenceSetting) + "]" + ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -52,41 +51,38 @@ namespace GISApi.Controllers
         /// <returns>User model</returns>
         [HttpGet("{id}")]
         //[Authorize(Policy = "Permissions.Site Admin.User.ReadOnly,Permissions.Site Admin.User.AddUpdateDelete")]
-        public async Task<ActionResult<FilterSequenceSetting>> Get(int id)
+        public async Task<ActionResult<SequenceSetting>> Get(int id)
         {
             try
             {
-                List<FilterSequenceSetting> list  = await _service.GetFilterSequenceSetting();
-             
+                SequenceSetting model = await _service.GetSequenceSettingId(id);
 
-                return Ok(list);
+
+                return Ok(model);
             }
             catch (Exception ex)
             {
-                _logger.LogError("[" + nameof(FilterSequenceSettingController) + "." + nameof(Get) + "]" + ex);
+                _logger.LogError("[" + nameof(SequenceSettingController) + "." + nameof(Get) + "]" + ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
 
         /// <summary>
         /// Get users by id
         /// </summary>
         /// <param name="id">User id</param>
         /// <returns>User model</returns>
-        [HttpGet("FilterSequenceByControllerId/{id}")]
-        //[Authorize(Policy = "Permissions.Site Admin.User.ReadOnly,Permissions.Site Admin.User.AddUpdateDelete")]
-        public async Task<ActionResult<FilterSequenceSetting>> GetFilterSequenceByControllerId(int id)
+        [HttpGet("SequenceSettingByControllerId/{id}")]
+        public async Task<IActionResult> GetSequenceSettingByControllerId(int id)
         {
             try
             {
-              List< FilterSequenceSetting> model = await _service.GetDataByControllerId(id);
-               
-                return Ok(model);
+                List<SequenceSetting> list = await _service.GetDataByControllerId(id);
+                return Ok(list);
             }
             catch (Exception ex)
             {
-                _logger.LogError("[" + nameof(FilterSequenceSettingController) + "." + nameof(GetFilterSequenceByControllerId) + "]" + ex);
+                _logger.LogError("[" + nameof(SequenceSettingController) + "." + nameof(GetSequenceSettingByControllerId) + "]" + ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -98,11 +94,11 @@ namespace GISApi.Controllers
         /// <returns></returns>
         [HttpPost]
         //[Authorize(Policy = "Permissions.Site Admin.User.AddUpdateDelete")]
-        public async Task<IActionResult> Post(FilterSequenceSetting model)
+        public async Task<IActionResult> Post(SequenceSetting model)
         {
             try
             {
-                var result = await _service.AddFilterSequenceSetting(model);
+                var result = await _service.AddSequenceSetting(model);
                 return Ok();
             }
             catch (Exception ex)
@@ -124,12 +120,12 @@ namespace GISApi.Controllers
         {
             try
             {
-                var role = await _service.DeleteFilterSequenceSetting(id);
+                var role = await _service.DeleteSequenceSetting(id);
                 return Ok();
             }
             catch (Exception ex)
             {
-                _logger.LogError("[" + nameof(FilterSequenceSettingController) + "." + nameof(Delete) + "]" + ex);
+                _logger.LogError("[" + nameof(SequenceSettingController) + "." + nameof(Delete) + "]" + ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -141,7 +137,7 @@ namespace GISApi.Controllers
         /// <returns>RoleViewModel</returns>
         [HttpPut("{id}")]
         //[Authorize(Policy = "Permissions.Site Admin.User.AddUpdateDelete")]
-        public async Task<ActionResult<OperationResult<ControllerTimeSetting>>> Put(int id, [FromBody] FilterSequenceSetting model)
+        public async Task<ActionResult<OperationResult<ControllerTimeSetting>>> Put(int id, [FromBody] SequenceSetting model)
         {
 
             try
@@ -150,7 +146,7 @@ namespace GISApi.Controllers
                 {
                     return BadRequest();
                 }
-                var result = _service.EditFilterSequenceSetting(model);
+                var result = _service.EditSequenceSetting(model);
 
                 return Ok();
             }
@@ -166,6 +162,5 @@ namespace GISApi.Controllers
             //}
 
         }
-
     }
 }
